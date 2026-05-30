@@ -25,7 +25,7 @@ Este repositório reúne os conceitos, templates e práticas abordados no worksh
 
 - Automação de deployments entre ambientes (Dev → QA → Prod)
 - Versionamento de artefatos do Fabric via Git
-- Integração com **Azure DevOps** e a biblioteca **PyFabricOps (Yemo)**
+- Integração com **Azure DevOps** e a biblioteca **PyFabricOps**
 - Gestão segura de credenciais com **Azure Key Vault**
 
 O objetivo central é ensinar os fundamentos de DevOps aplicados ao ecossistema Microsoft Fabric, de forma que as práticas possam ser adaptadas a qualquer empresa, independentemente das ferramentas específicas utilizadas.
