@@ -1,6 +1,6 @@
 # 🚀 CI/CD no Microsoft Fabric com Azure DevOps
 
-> Workshop prático conduzido por **Sidney** e **Alison** — comunidade Power BI Brasil
+> Workshop prático conduzido por **Sidney** e **Alison** — comunidade Power BI / Fabric
 
 ---
 
