@@ -1,0 +1,116 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/variableLibrary/definition/valueSet/1.0.0/schema.json",
+  "name": "main",
+  "variableOverrides": [
+    {
+      "name": "workspace_name",
+      "value": "Workshop_DMF-PRD"
+    },
+    {
+      "name": "lakehouse_bronze",
+      "value": {
+        "itemId": "035e727d-14f5-400d-9d38-03ad13b2b261",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "lakehouse_silver",
+      "value": {
+        "itemId": "5ca07608-a718-4e4e-bf23-3e632b323c01",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "lakehouse_gold",
+      "value": {
+        "itemId": "d44f7093-0c96-4500-a218-15cfd0cd6fc9",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "workspace_id",
+      "value": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+    },
+    {
+      "name": "nb_load_bronze",
+      "value": {
+        "itemId": "0af2951c-8401-4f8d-8d80-80d69b032acc",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_techinical_validation",
+      "value": {
+        "itemId": "86fa00fa-b5b3-45b3-9243-7c0d9d25d876",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_clean_data",
+      "value": {
+        "itemId": "05944090-5c84-4e22-a2e1-d86ab692e1ce",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_historize_data_scd2",
+      "value": {
+        "itemId": "845d43f0-e438-4f65-8e34-8e149d73f821",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_create_gold_tables",
+      "value": {
+        "itemId": "f4dffcd1-4c29-4008-88b8-e6f237d385b4",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_dimension_date",
+      "value": {
+        "itemId": "11af6bdd-c6b5-4a47-baf6-cf66c60e8b44",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_dimension_product",
+      "value": {
+        "itemId": "b952686b-2d3f-4a86-8545-db3610404ebd",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_dimension_customer",
+      "value": {
+        "itemId": "182c9cc5-b540-49e7-afdc-b854755af60e",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_dimension_address",
+      "value": {
+        "itemId": "73aa8a16-8f17-4a8c-9a9f-d64f09a557a8",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_fact_sales",
+      "value": {
+        "itemId": "06009ac5-5eb9-4220-a430-a88ef4d83cb8",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "nb_dimension_date2",
+      "value": {
+        "itemId": "11af6bdd-c6b5-4a47-baf6-cf66c60e8b44",
+        "workspaceId": "18f1cee2-78d2-4092-a35b-5da1c86b8b46"
+      }
+    },
+    {
+      "name": "lakehouse_bronze_id",
+      "value": "035e727d-14f5-400d-9d38-03ad13b2b261"
+    }
+  ]
+}

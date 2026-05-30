@@ -1,0 +1,65 @@
+table date
+	lineageTag: a870a0b5-b788-483a-8e0f-e01bb031fea3
+	sourceLineageTag: [adventureworks].[dimension_date]
+
+	column ID
+		dataType: string
+		isHidden
+		lineageTag: 31233d30-3fdf-4022-8639-fce9a9191fd5
+		sourceLineageTag: ID
+		summarizeBy: none
+		sourceColumn: ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderDate
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1352d2fb-07cb-478b-ba02-c926a3680df4
+		sourceLineageTag: OrderDate
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		annotation SummarizationSetBy = Automatic
+
+	column Day
+		dataType: int64
+		formatString: 0
+		lineageTag: 9cdb38fb-dfbb-4c5e-9bd9-702e31497dd9
+		sourceLineageTag: Day
+		summarizeBy: none
+		sourceColumn: Day
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: 5fdd401b-a077-4ff5-82f6-b0dea2ee5285
+		sourceLineageTag: Month
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 5774556c-0ebb-4cbb-b6b5-a6377aa1ed5a
+		sourceLineageTag: Year
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	partition date = entity
+		mode: directLake
+		source
+			entityName: dimension_date
+			schemaName: adventureworks
+			expressionSource: 'DirectLake - gold'
+
+	changedProperty = Name
+

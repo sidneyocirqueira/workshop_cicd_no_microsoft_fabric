@@ -1,0 +1,137 @@
+table customer
+	lineageTag: 1d763381-5610-460c-b518-1491b674d9ab
+	sourceLineageTag: [adventureworks].[dimension_customer]
+
+	column ID
+		dataType: string
+		isHidden
+		lineageTag: 8ece5992-d204-4735-ba73-6a37f72cf137
+		sourceLineageTag: ID
+		summarizeBy: none
+		sourceColumn: ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8f91014d-d7e5-41d4-9f40-23dfd916e47f
+		sourceLineageTag: CustomerID
+		summarizeBy: count
+		sourceColumn: CustomerID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Title
+		dataType: string
+		lineageTag: 4f31aaa7-ce61-4c60-817c-296ffd6b5cc9
+		sourceLineageTag: Title
+		summarizeBy: none
+		sourceColumn: Title
+
+		annotation SummarizationSetBy = Automatic
+
+	column FirstName
+		dataType: string
+		lineageTag: 9225d722-0a0d-4c12-9196-4f17cf7cb6b1
+		sourceLineageTag: FirstName
+		summarizeBy: none
+		sourceColumn: FirstName
+
+		annotation SummarizationSetBy = Automatic
+
+	column MiddleName
+		dataType: string
+		lineageTag: 361d963c-f313-44ee-8ee9-832ed7ed8a29
+		sourceLineageTag: MiddleName
+		summarizeBy: none
+		sourceColumn: MiddleName
+
+		annotation SummarizationSetBy = Automatic
+
+	column LastName
+		dataType: string
+		lineageTag: ef0a7d55-6e54-4a41-99d2-3e6497ebaf10
+		sourceLineageTag: LastName
+		summarizeBy: none
+		sourceColumn: LastName
+
+		annotation SummarizationSetBy = Automatic
+
+	column CompanyName
+		dataType: string
+		lineageTag: bdbf4aa1-a488-4252-8737-a380b2e9665c
+		sourceLineageTag: CompanyName
+		summarizeBy: none
+		sourceColumn: CompanyName
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmailAddress
+		dataType: string
+		lineageTag: e07f9ea0-f820-416f-8f58-d21949aa726f
+		sourceLineageTag: EmailAddress
+		summarizeBy: none
+		sourceColumn: EmailAddress
+
+		annotation SummarizationSetBy = Automatic
+
+	column Phone
+		dataType: string
+		lineageTag: c6ec700f-eb13-4791-85b7-913b17b117f2
+		sourceLineageTag: Phone
+		summarizeBy: none
+		sourceColumn: Phone
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_flag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 2863c01b-ca1a-474c-81b6-42c129637b45
+		sourceLineageTag: current_flag
+		summarizeBy: none
+		sourceColumn: current_flag
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: b5f686c0-4916-4af5-b93a-497bee4d1dd0
+		sourceLineageTag: current_date
+		summarizeBy: none
+		sourceColumn: current_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: eaa622fb-e593-41a0-8e21-b5c25b5520e3
+		sourceLineageTag: end_date
+		summarizeBy: none
+		sourceColumn: end_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition customer = entity
+		mode: directLake
+		source
+			entityName: dimension_customer
+			schemaName: adventureworks
+			expressionSource: 'DirectLake - gold'
+
+	changedProperty = Name
+

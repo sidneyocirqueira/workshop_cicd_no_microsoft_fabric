@@ -1,0 +1,29 @@
+trigger: none
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/**
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - checkout: self
+
+  - task: UsePythonVersion@0
+    displayName: Set up Python 3.14
+    inputs:
+      versionSpec: '3.14'
+
+  - script: pip install uv
+    displayName: Install uv
+
+  - script: uv sync --group dev --no-install-project
+    displayName: Install dev dependencies
+
+  - script: uv run pytest tests/ -v
+    displayName: Run PBIP tests

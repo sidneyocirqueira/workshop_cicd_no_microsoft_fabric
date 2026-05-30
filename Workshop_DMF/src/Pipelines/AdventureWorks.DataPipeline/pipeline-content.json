@@ -1,0 +1,641 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "name": "LookupTables",
+        "description": "Performs a lookup on the 'AdventureWorks' Azure SQL Database to retrieve all base tables in the 'SalesLT' schema using a SQL query.",
+        "type": "Lookup",
+        "dependsOn": [],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "source": {
+            "type": "AzureSqlSource",
+            "sqlReaderQuery": "SELECT * FROM INFORMATION_SCHEMA.TABLES\nWHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = 'SalesLT'\n",
+            "queryTimeout": "02:00:00",
+            "partitionOption": "None"
+          },
+          "firstRowOnly": false,
+          "datasetSettings": {
+            "annotations": [],
+            "type": "AzureSqlTable",
+            "schema": [],
+            "typeProperties": {},
+            "externalReferences": {
+              "connection": "@pipeline().libraryVariables.EnvironmentVariables_connection.connectionId"
+            }
+          }
+        }
+      },
+      {
+        "name": "ForEachTable",
+        "description": "Iterates over the list of tables returned by 'LookupTables', executing a set of child activities for each table.",
+        "type": "ForEach",
+        "dependsOn": [
+          {
+            "activity": "LookupTables",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "typeProperties": {
+          "items": {
+            "value": "@activity('LookupTables').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "name": "CopyTable",
+              "description": "Copies data from each source table in the 'AdventureWorks' Azure SQL Database to a Parquet file in the LakehouseFiles storage, with the file and folder path dynamically generated per table.",
+              "type": "Copy",
+              "dependsOn": [],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "AzureSqlSource",
+                  "queryTimeout": "02:00:00",
+                  "partitionOption": "None",
+                  "datasetSettings": {
+                    "annotations": [],
+                    "type": "AzureSqlTable",
+                    "schema": [],
+                    "typeProperties": {
+                      "schema": {
+                        "value": "@item().table_schema",
+                        "type": "Expression"
+                      },
+                      "table": {
+                        "value": "@item().table_name",
+                        "type": "Expression"
+                      }
+                    },
+                    "externalReferences": {
+                      "connection": "@pipeline().libraryVariables.EnvironmentVariables_connection.connectionId"
+                    }
+                  }
+                },
+                "sink": {
+                  "type": "ParquetSink",
+                  "storeSettings": {
+                    "type": "AzureBlobStorageWriteSettings"
+                  },
+                  "formatSettings": {
+                    "type": "ParquetWriteSettings",
+                    "enableVertiParquet": true
+                  },
+                  "datasetSettings": {
+                    "annotations": [],
+                    "linkedService": {
+                      "name": "673cf467_613d_488e_b827_9bef11cfcb2f",
+                      "properties": {
+                        "annotations": [],
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "workspaceId": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+                          "artifactId": "@pipeline().libraryVariables.EnvironmentVariables_lakehouse_bronze.itemId",
+                          "rootFolder": "Files"
+                        }
+                      }
+                    },
+                    "type": "Parquet",
+                    "typeProperties": {
+                      "location": {
+                        "type": "LakehouseLocation",
+                        "fileName": {
+                          "value": "@concat(item().table_name,'.parquet')",
+                          "type": "Expression"
+                        },
+                        "folderPath": {
+                          "value": "@concat('adventureworks/', formatDateTime(utcnow(), 'yyyyMMdd'))",
+                          "type": "Expression"
+                        }
+                      },
+                      "compressionCodec": "snappy"
+                    },
+                    "schema": []
+                  }
+                },
+                "enableStaging": false,
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                }
+              }
+            },
+            {
+              "name": "CreateBronzeTables",
+              "description": "Runs the 'load_bronze' notebook in the 'Workshop_DMF' workspace after data is copied, likely to process or register the newly copied bronze-level tables.",
+              "type": "TridentNotebook",
+              "dependsOn": [
+                {
+                  "activity": "CopyTable",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "typeProperties": {
+                "notebookId": {
+                  "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_load_bronze.itemId",
+                  "type": "Expression"
+                },
+                "workspaceId": {
+                  "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+                  "type": "Expression"
+                },
+                "parameters": {
+                  "schemaName": {
+                    "value": "adventureworks",
+                    "type": "string"
+                  },
+                  "tableName": {
+                    "value": {
+                      "value": "@item().table_name ",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  },
+                  "filePath": {
+                    "value": {
+                      "value": "@formatDateTime(utcnow(), 'yyyyMMdd')",
+                      "type": "Expression"
+                    },
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            {
+              "name": "LookupMetadata",
+              "description": "Performs a lookup in the 'AdventureWorks' database to retrieve metadata for each table from the '[dbo].[SchemaMetadata]' table, after bronze tables are created.",
+              "type": "Lookup",
+              "dependsOn": [
+                {
+                  "activity": "CreateBronzeTables",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ],
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureOutput": false,
+                "secureInput": false
+              },
+              "typeProperties": {
+                "source": {
+                  "type": "AzureSqlSource",
+                  "sqlReaderQuery": {
+                    "value": "@concat('SELECT * FROM [dbo].[SchemaMetadata]\nWHERE SchemaName=''AdventureWorks''\nAND TableName=''',item().table_name,'''')",
+                    "type": "Expression"
+                  },
+                  "queryTimeout": "02:00:00",
+                  "partitionOption": "None"
+                },
+                "firstRowOnly": false,
+                "datasetSettings": {
+                  "annotations": [],
+                  "type": "AzureSqlTable",
+                  "schema": [],
+                  "typeProperties": {},
+                  "externalReferences": {
+                    "connection": "@pipeline().libraryVariables.EnvironmentVariables_connection.connectionId"
+                  }
+                }
+              }
+            },
+            {
+              "name": "If Condition",
+              "description": "Evaluates a condition based on the output of 'LookupMetadata'. If true, triggers the 'TechnicalValidation' activity.",
+              "type": "IfCondition",
+              "dependsOn": [
+                {
+                  "activity": "LookupMetadata",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ],
+              "typeProperties": {
+                "expression": {
+                  "value": "@greater(activity('LookupMetadata').output.count, 0)",
+                  "type": "Expression"
+                },
+                "ifFalseActivities": [],
+                "ifTrueActivities": [
+                  {
+                    "name": "TechnicalValidation",
+                    "type": "TridentNotebook",
+                    "dependsOn": [],
+                    "policy": {
+                      "timeout": "0.12:00:00",
+                      "retry": 0,
+                      "retryIntervalInSeconds": 30,
+                      "secureOutput": false,
+                      "secureInput": false
+                    },
+                    "typeProperties": {
+                      "notebookId": {
+                        "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_techinical_validation.itemId",
+                        "type": "Expression"
+                      },
+                      "workspaceId": {
+                        "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+                        "type": "Expression"
+                      },
+                      "parameters": {
+                        "schemaName": {
+                          "value": "adventureworks",
+                          "type": "string"
+                        },
+                        "tableName": {
+                          "value": {
+                            "value": "@item().table_name",
+                            "type": "Expression"
+                          },
+                          "type": "string"
+                        },
+                        "metadata": {
+                          "value": {
+                            "value": "@string(activity('LookupMetadata').output.value)",
+                            "type": "Expression"
+                          },
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "DataCleasing",
+        "description": "Runs the 'clean_data' notebook in the 'Workshop_DMF' workspace after all tables have been processed, to cleanse the data.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "ForEachTable",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_clean_data.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "DataHistorization",
+        "description": "Runs the 'historize_data_scd2' notebook in the 'Workshop_DMF' workspace after data cleansing, to apply SCD2 historization logic.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "DataCleasing",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_historize_data_scd2.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "CreateGoldTables",
+        "description": "Runs the 'create_gold_tables' notebook in the 'Workshop_DMF' workspace after historization, to create gold-level tables.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "DataHistorization",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_create_gold_tables.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "DateDimension",
+        "description": "Runs the 'dimension_date' notebook in the 'Workshop_DMF' workspace after gold tables are created, to build the date dimension.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "CreateGoldTables",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_dimension_date.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "ProductDimension",
+        "description": "Runs the 'dimension_product' notebook in the 'Workshop_DMF' workspace after gold tables are created, to build the product dimension.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "CreateGoldTables",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_dimension_product.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "CustomerDimension",
+        "description": "Runs the 'dimension_customer' notebook in the 'Workshop_DMF' workspace after gold tables are created, to build the customer dimension.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "CreateGoldTables",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_dimension_customer.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "AddressDimension",
+        "description": "Runs the 'dimension_address' notebook in the 'Workshop_DMF' workspace after gold tables are created, to build the address dimension.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "CreateGoldTables",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_dimension_address.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      },
+      {
+        "name": "SalesFact",
+        "description": "Runs the 'fact_sales' notebook in the 'Workshop_DMF' workspace after all dimension tables are created, to build the sales fact table.",
+        "type": "TridentNotebook",
+        "dependsOn": [
+          {
+            "activity": "DateDimension",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "ProductDimension",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "CustomerDimension",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          },
+          {
+            "activity": "AddressDimension",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ],
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureOutput": false,
+          "secureInput": false
+        },
+        "typeProperties": {
+          "notebookId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_nb_fact_sales.itemId",
+            "type": "Expression"
+          },
+          "workspaceId": {
+            "value": "@pipeline().libraryVariables.EnvironmentVariables_workspace_id",
+            "type": "Expression"
+          }
+        }
+      }
+    ],
+    "libraryVariables": {
+      "EnvironmentVariables_workspace_name": {
+        "type": "String",
+        "variableName": "workspace_name",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_workspace_id": {
+        "type": "String",
+        "variableName": "workspace_id",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_lakehouse_bronze": {
+        "type": "Object",
+        "variableName": "lakehouse_bronze",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_lakehouse_silver": {
+        "type": "Object",
+        "variableName": "lakehouse_silver",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_lakehouse_gold": {
+        "type": "Object",
+        "variableName": "lakehouse_gold",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_connection": {
+        "type": "Object",
+        "variableName": "connection",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_load_bronze": {
+        "type": "Object",
+        "variableName": "nb_load_bronze",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_techinical_validation": {
+        "type": "Object",
+        "variableName": "nb_techinical_validation",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_clean_data": {
+        "type": "Object",
+        "variableName": "nb_clean_data",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_historize_data_scd2": {
+        "type": "Object",
+        "variableName": "nb_historize_data_scd2",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_create_gold_tables": {
+        "type": "Object",
+        "variableName": "nb_create_gold_tables",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_dimension_date": {
+        "type": "Object",
+        "variableName": "nb_dimension_date",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_dimension_product": {
+        "type": "Object",
+        "variableName": "nb_dimension_product",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_dimension_customer": {
+        "type": "Object",
+        "variableName": "nb_dimension_customer",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_dimension_address": {
+        "type": "Object",
+        "variableName": "nb_dimension_address",
+        "libraryName": "EnvironmentVariables"
+      },
+      "EnvironmentVariables_nb_fact_sales": {
+        "type": "Object",
+        "variableName": "nb_fact_sales",
+        "libraryName": "EnvironmentVariables"
+      }
+    }
+  }
+}

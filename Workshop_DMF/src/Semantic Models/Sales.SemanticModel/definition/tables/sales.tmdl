@@ -1,0 +1,135 @@
+table sales
+	lineageTag: 6ffae828-e2fd-488d-873c-9a5c87299af3
+	sourceLineageTag: [adventureworks].[fact_sales]
+
+	column SalesKey
+		dataType: string
+		lineageTag: 350b3ae8-6009-4985-8276-5f80966d3f86
+		sourceLineageTag: SalesKey
+		summarizeBy: none
+		sourceColumn: SalesKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column AddressKey
+		dataType: string
+		lineageTag: adb13e3d-8f99-4b3e-9574-9d3973f7579c
+		sourceLineageTag: AddressKey
+		summarizeBy: none
+		sourceColumn: AddressKey
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerKey
+		dataType: string
+		isHidden
+		lineageTag: 86c35d4d-c6a9-4ebe-a133-ce2e608a2b6b
+		sourceLineageTag: CustomerKey
+		summarizeBy: none
+		sourceColumn: CustomerKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductKey
+		dataType: string
+		isHidden
+		lineageTag: 8fb943e2-32d5-454a-bf48-e330211c0b52
+		sourceLineageTag: ProductKey
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateKey
+		dataType: string
+		isHidden
+		lineageTag: 414572d5-b137-4d7b-84be-cc46ddde4c71
+		sourceLineageTag: DateKey
+		summarizeBy: none
+		sourceColumn: DateKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: double
+		lineageTag: 796aad90-dd79-4155-a58e-391609d9ede5
+		sourceLineageTag: Revenue
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column OrderQty
+		dataType: int64
+		formatString: 0
+		lineageTag: 164d3da3-d4e1-4de9-9d88-1381838a7409
+		sourceLineageTag: OrderQty
+		summarizeBy: sum
+		sourceColumn: OrderQty
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnitPrice
+		dataType: double
+		lineageTag: d12a2ecb-fb97-4a90-af9d-579eea8170fa
+		sourceLineageTag: UnitPrice
+		summarizeBy: sum
+		sourceColumn: UnitPrice
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column current_flag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: ab82165f-c0db-4441-8ce9-01624229a11d
+		sourceLineageTag: current_flag
+		summarizeBy: none
+		sourceColumn: current_flag
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: a3e497db-987e-44bd-a5ad-da134b21eeb4
+		sourceLineageTag: current_date
+		summarizeBy: none
+		sourceColumn: current_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: d6a24984-5550-4024-bed1-ca0afc12307a
+		sourceLineageTag: end_date
+		summarizeBy: none
+		sourceColumn: end_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition sales = entity
+		mode: directLake
+		source
+			entityName: fact_sales
+			schemaName: adventureworks
+			expressionSource: 'DirectLake - gold'
+
+	changedProperty = Name
+

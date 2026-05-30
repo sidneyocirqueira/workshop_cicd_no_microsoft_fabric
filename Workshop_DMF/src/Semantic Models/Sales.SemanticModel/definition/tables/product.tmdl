@@ -1,0 +1,128 @@
+table product
+	lineageTag: 35f948ee-dbd0-4648-b2be-b81c8701526a
+	sourceLineageTag: [adventureworks].[dimension_product]
+
+	column ID
+		dataType: string
+		isHidden
+		lineageTag: 08641ada-11bc-4982-8a1d-a13cffda745a
+		sourceLineageTag: ID
+		summarizeBy: none
+		sourceColumn: ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductID
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 2f87921c-0cdd-4ac8-b25e-bb4cfee118d8
+		sourceLineageTag: ProductID
+		summarizeBy: count
+		sourceColumn: ProductID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductNumber
+		dataType: string
+		lineageTag: 53a6110a-7d3b-497f-8411-62c863d57f41
+		sourceLineageTag: ProductNumber
+		summarizeBy: none
+		sourceColumn: ProductNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column Color
+		dataType: string
+		lineageTag: 59118b8e-f83c-4bdc-8ac4-3a7a63a97dd1
+		sourceLineageTag: Color
+		summarizeBy: none
+		sourceColumn: Color
+
+		annotation SummarizationSetBy = Automatic
+
+	column Size
+		dataType: string
+		lineageTag: 279a036c-c258-46bf-9de6-fc3c8014ac95
+		sourceLineageTag: Size
+		summarizeBy: none
+		sourceColumn: Size
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weight
+		dataType: string
+		lineageTag: 56ba0191-9562-41dc-9ea8-efb0fef6337c
+		sourceLineageTag: Weight
+		summarizeBy: none
+		sourceColumn: Weight
+
+		annotation SummarizationSetBy = Automatic
+
+	column CategoryName
+		dataType: string
+		lineageTag: 4a0f5c27-f9d7-4550-85a5-eff4fc92bda2
+		sourceLineageTag: CategoryName
+		summarizeBy: none
+		sourceColumn: CategoryName
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductModelName
+		dataType: string
+		lineageTag: 3ad91f12-1094-4fc0-bf49-b5bc665b79b4
+		sourceLineageTag: ProductModelName
+		summarizeBy: none
+		sourceColumn: ProductModelName
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_flag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 68e58255-d6e5-46d8-80b2-be95eba27e10
+		sourceLineageTag: current_flag
+		summarizeBy: none
+		sourceColumn: current_flag
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 54c30e31-6cc8-4c19-b2be-7bf5990ab323
+		sourceLineageTag: current_date
+		summarizeBy: none
+		sourceColumn: current_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: b5c7bf86-c592-4963-8bed-138a82e11e29
+		sourceLineageTag: end_date
+		summarizeBy: none
+		sourceColumn: end_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition product = entity
+		mode: directLake
+		source
+			entityName: dimension_product
+			schemaName: adventureworks
+			expressionSource: 'DirectLake - gold'
+
+	changedProperty = Name
+

@@ -1,0 +1,75 @@
+{
+  "properties": {
+    "jobMode": "Batch",
+    "source": {
+      "type": "AzureSqlTable",
+      "connectionSettings": {
+        "type": "AzureSqlDatabase",
+        "typeProperties": {
+          "database": "AdventureWorks"
+        },
+        "externalReferences": {
+          "connectionVariableLibrary": {
+            "variableName": "connection_id",
+            "libraryName": "EnvironmentVariables"
+          }
+        }
+      }
+    },
+    "destination": {
+      "type": "LakehouseTable",
+      "connectionSettings": {
+        "type": "Lakehouse",
+        "typeProperties": {
+          "workspaceIdVariableLibrary": {
+            "variableName": "workspace_id",
+            "libraryName": "EnvironmentVariables"
+          },
+          "artifactIdVariableLibrary": {
+            "variableName": "lakehouse_bronze_id",
+            "libraryName": "EnvironmentVariables"
+          },
+          "rootFolder": "Tables"
+        }
+      }
+    },
+    "policy": {
+      "timeout": "0.12:00:00",
+      "retry": 0
+    }
+  },
+  "activities": [
+    {
+      "id": "7b33e2b0-ffb8-4be3-8a35-5ba701104add",
+      "properties": {
+        "source": {
+          "datasetSettings": {
+            "schema": "SalesLT",
+            "table": "Address"
+          },
+          "partitionSettings": {
+            "partitionOption": "None"
+          }
+        },
+        "destination": {
+          "writeBehavior": "Append",
+          "datasetSettings": {
+            "schema": "SalesLT",
+            "table": "Address2"
+          },
+          "applyVOrder": false
+        },
+        "enableStaging": false,
+        "translator": {
+          "type": "TabularTranslator"
+        },
+        "typeConversionSettings": {
+          "typeConversion": {
+            "allowDataTruncation": true,
+            "treatBooleanAsNumber": false
+          }
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+[project]
+name = "workshop-dmf"
+version = "0.1.0"
+description = "Workshop Dominando Microsoft Fabric com CICD"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = ["pyfabricops"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.15.13",
+]

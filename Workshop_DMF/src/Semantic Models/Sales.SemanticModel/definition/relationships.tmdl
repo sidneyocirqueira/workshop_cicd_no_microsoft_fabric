@@ -1,0 +1,17 @@
+relationship 3dcb6b02-dd1a-5669-5c37-02ba7614ec5c
+	fromColumn: address.ID
+	toColumn: sales.AddressKey
+
+relationship 6f488d1e-02d9-3358-f30e-bcd2e4422a14
+	fromColumn: customer.ID
+	toColumn: sales.CustomerKey
+
+relationship eacf8458-aa4f-9c12-7980-2d55833d3f9c
+	fromColumn: sales.DateKey
+	toColumn: date.ID
+
+relationship 70d3d794-44e0-f54d-b853-62c1f05f70bd
+	relyOnReferentialIntegrity
+	fromColumn: product.ID
+	toColumn: sales.ProductKey
+

@@ -1,0 +1,119 @@
+table address
+	lineageTag: 820b9ba8-0c58-40d6-be65-56426a2e0a5d
+	sourceLineageTag: [adventureworks].[dimension_address]
+
+	column ID
+		dataType: string
+		isHidden
+		lineageTag: dd49dd64-4f55-4207-ad47-db181cfe91eb
+		sourceLineageTag: ID
+		summarizeBy: none
+		sourceColumn: ID
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column AddressID
+		dataType: int64
+		formatString: 0
+		lineageTag: 39d01168-c980-4324-a5fd-976df3573047
+		sourceLineageTag: AddressID
+		summarizeBy: count
+		sourceColumn: AddressID
+
+		annotation SummarizationSetBy = Automatic
+
+	column AddressLine1
+		dataType: string
+		isHidden
+		lineageTag: 606806cb-5adf-4e00-a3f1-eda3722d8ac6
+		sourceLineageTag: AddressLine1
+		summarizeBy: none
+		sourceColumn: AddressLine1
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column AddressLine2
+		dataType: string
+		lineageTag: 1fb8ee9d-c5f9-4235-87f4-07ae74f7352b
+		sourceLineageTag: AddressLine2
+		summarizeBy: none
+		sourceColumn: AddressLine2
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 726b038a-8bd9-4229-b306-ae559e407aab
+		sourceLineageTag: City
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column StateProvince
+		dataType: string
+		lineageTag: e8adb0f1-0fb1-4fb4-953b-de162b4fcd9c
+		sourceLineageTag: StateProvince
+		summarizeBy: none
+		sourceColumn: StateProvince
+
+		annotation SummarizationSetBy = Automatic
+
+	column CountryRegion
+		dataType: string
+		lineageTag: b4af4594-31ac-4c12-a97b-fea88b8dd8db
+		sourceLineageTag: CountryRegion
+		summarizeBy: none
+		sourceColumn: CountryRegion
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_flag
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1e196380-28dc-446e-a589-8a945f2becd3
+		sourceLineageTag: current_flag
+		summarizeBy: none
+		sourceColumn: current_flag
+
+		annotation SummarizationSetBy = Automatic
+
+	column current_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: a298b081-74e9-4e67-adb9-89a175b72d23
+		sourceLineageTag: current_date
+		summarizeBy: none
+		sourceColumn: current_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column end_date
+		dataType: dateTime
+		isHidden
+		formatString: General Date
+		lineageTag: 6b27562f-2fec-41df-8e95-b92c4b09345c
+		sourceLineageTag: end_date
+		summarizeBy: none
+		sourceColumn: end_date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition address = entity
+		mode: directLake
+		source
+			entityName: dimension_address
+			schemaName: adventureworks
+			expressionSource: 'DirectLake - gold'
+
+	changedProperty = Name
+
