@@ -77,7 +77,7 @@ O objetivo central é ensinar os fundamentos de DevOps aplicados ao ecossistema 
               │   Microsoft Fabric│         │ trigger (merge)
               │                   │         │
               │  [Dev Workspace]  │◄────────┘
-              │  [QA  Workspace]  │  PyFabricOps / Yemo
+              │  [QA  Workspace]  │  PyFabricOps 
               │  [Prod Workspace] │
               └─────────┬─────────┘
                         │
